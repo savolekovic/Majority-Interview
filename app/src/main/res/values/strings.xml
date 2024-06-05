@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">MajorityTechAssignment</string>
+    <string name="search">Search</string>
+    <string name="countries">Countries</string>
+    <string name="connection_error">Check your internet connection and try again.</string>
+    <string name="unknown_error">Something went wrong. Try again later.</string>
+</resources>
