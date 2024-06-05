@@ -74,6 +74,10 @@ class CountryAdapter : RecyclerView.Adapter<CountryAdapter.CountryViewHolder>() 
         differ.submitList(countries)
     }
 
+    fun refreshList(){
+        differ.submitList(fullCountryList)
+    }
+
     fun searchCountries(query: String) {
         val filteredList = if (query.isEmpty()) fullCountryList
         else fullCountryList.filter {

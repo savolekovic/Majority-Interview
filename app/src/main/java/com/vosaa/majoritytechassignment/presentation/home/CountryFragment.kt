@@ -18,7 +18,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.shape.MaterialShapeDrawable
 import com.vosaa.majoritytechassignment.R
 import com.vosaa.majoritytechassignment.activites.MainActivity
 import com.vosaa.majoritytechassignment.databinding.FragmentCountryBinding
@@ -27,6 +26,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class CountryFragment : Fragment() {
@@ -53,12 +53,17 @@ class CountryFragment : Fragment() {
         val activity = requireActivity() as MainActivity
         activity.setSupportActionBar(binding.homeToolbar)
 
-
         setupMenu()
         setupRecycler()
+        setupErrorButton()
         observeViewModel()
         viewModel.getAllCountries()
+    }
 
+    private fun setupErrorButton() {
+        binding.errorButton.setOnClickListener {
+            viewModel.getAllCountries()
+        }
     }
 
     private fun observeViewModel() {
@@ -75,6 +80,7 @@ class CountryFragment : Fragment() {
 
                     UiStates.NO_INTERNET_CONNECTION -> {
                         binding.homeLoading.visibility = View.GONE
+                        binding.homeErrorContainer.visibility = View.VISIBLE
                         Toast.makeText(
                             binding.root.context,
                             getString(R.string.connection_error),
@@ -84,6 +90,7 @@ class CountryFragment : Fragment() {
 
                     else -> {
                         binding.homeLoading.visibility = View.GONE
+                        binding.homeErrorContainer.visibility = View.VISIBLE
                         Toast.makeText(
                             binding.root.context,
                             getString(R.string.unknown_error),
@@ -97,7 +104,6 @@ class CountryFragment : Fragment() {
             viewModel.countriesDataFlow.collectLatest {
                 //Submit list to adapter
                 countryAdapter.submitList(it)
-                if (it.isEmpty()) binding.homeErrorContainer.visibility = View.VISIBLE
             }
         }
     }
@@ -139,6 +145,10 @@ class CountryFragment : Fragment() {
                 if (menuItem.itemId == R.id.action_search) searchView =
                     menuItem.actionView as SearchView
                 searchView.setQueryHint("Search countries...")
+                searchView.setOnCloseListener {
+                    countryAdapter.refreshList()
+                    false
+                }
                 searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                     override fun onQueryTextSubmit(query: String): Boolean {
                         countryAdapter.searchCountries(query)
