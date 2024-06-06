@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.daggerHilt)
     alias(libs.plugins.kapt)
+    alias(libs.plugins.serialization)
     id("androidx.navigation.safeargs.kotlin")
 }
 
@@ -88,6 +89,11 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+
+    //Proto DataStore and PhotoBuffer
+    implementation(libs.androidx.datastore)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.collections.immutable)
 
     //Coroutines
     implementation(libs.kotlinx.coroutines.core)

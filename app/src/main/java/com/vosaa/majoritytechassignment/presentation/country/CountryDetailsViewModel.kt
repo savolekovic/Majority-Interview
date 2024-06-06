@@ -16,8 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CountryDetailsViewModel @Inject constructor(
-    private val repository: CountryRepository
-): ViewModel() {
+    private val repository: CountryRepository,
+) : ViewModel() {
     private val _countryDataFlow = MutableSharedFlow<Country>()
     val countryDataFlow = _countryDataFlow.asSharedFlow()
 

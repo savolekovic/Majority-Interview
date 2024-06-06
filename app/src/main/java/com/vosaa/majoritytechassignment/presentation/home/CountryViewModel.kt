@@ -19,7 +19,7 @@ class CountryViewModel @Inject constructor(
     private val repository: CountryRepository,
 ) : ViewModel() {
 
-    private val _countriesDataFlow = MutableSharedFlow<ArrayList<Country>>()
+    private val _countriesDataFlow = MutableSharedFlow<List<Country>>()
     val countriesDataFlow = _countriesDataFlow.asSharedFlow()
 
     private val _eventFlow = MutableSharedFlow<UiStates?>()

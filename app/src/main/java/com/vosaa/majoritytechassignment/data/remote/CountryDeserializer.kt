@@ -3,12 +3,9 @@ package com.vosaa.majoritytechassignment.data.remote
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
-import com.google.gson.reflect.TypeToken
 import com.vosaa.majoritytechassignment.domain.models.Country
-import com.vosaa.majoritytechassignment.domain.models.Currencies
 import com.vosaa.majoritytechassignment.domain.models.Flags
 import com.vosaa.majoritytechassignment.domain.models.Name
-import com.vosaa.majoritytechassignment.domain.models.NativeName
 import java.lang.reflect.Type
 import javax.inject.Inject
 import javax.inject.Singleton

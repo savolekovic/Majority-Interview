@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.daggerHilt) apply false
     alias(libs.plugins.kapt) apply false
+    alias(libs.plugins.serialization) apply false
 }
 
 buildscript {
