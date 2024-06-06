@@ -8,4 +8,11 @@
         android:title="@string/search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="collapseActionView|ifRoom" />
+
+    <item
+        android:id="@+id/action_refresh"
+        android:icon="@drawable/ic_redo"
+        android:title="@string/refresh"
+        app:showAsAction="collapseActionView|ifRoom" />
+
 </menu>

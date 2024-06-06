@@ -18,6 +18,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.vosaa.majoritytechassignment.R
 import com.vosaa.majoritytechassignment.activites.MainActivity
 import com.vosaa.majoritytechassignment.databinding.FragmentCountryBinding
@@ -51,20 +52,13 @@ class CountryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val activity = requireActivity() as MainActivity
-        activity.setSupportActionBar(binding.homeToolbar)
+        activity.setSupportActionBar(binding.countryToolbar)
 
-        setupRefresh()
         setupMenu()
         setupRecycler()
         setupErrorButton()
         observeViewModel()
         viewModel.getAllCountries()
-    }
-
-    private fun setupRefresh() {
-        binding.homeRefresh.setOnRefreshListener {
-            viewModel.refreshCountries()
-        }
     }
 
     private fun setupErrorButton() {
@@ -78,19 +72,16 @@ class CountryFragment : Fragment() {
             viewModel.eventFlow.collectLatest {
                 when (it) {
                     UiStates.LOADING -> {
-                        if (!binding.homeRefresh.isRefreshing)
-                            toggleProgressBar(true)
+                        toggleProgressBar(true)
                     }
 
                     UiStates.SUCCESS -> {
                         toggleProgressBar(false)
-                        binding.homeRefresh.isRefreshing = false
                     }
 
                     UiStates.NO_INTERNET_CONNECTION -> {
-                        binding.homeRefresh.isRefreshing = false
-                        binding.homeLoading.visibility = View.GONE
-                        binding.homeErrorContainer.visibility = View.VISIBLE
+                        binding.countryLoading.visibility = View.GONE
+                        binding.countryErrorContainer.visibility = View.VISIBLE
                         Toast.makeText(
                             binding.root.context,
                             getString(R.string.connection_error),
@@ -99,9 +90,8 @@ class CountryFragment : Fragment() {
                     }
 
                     else -> {
-                        binding.homeRefresh.isRefreshing = false
-                        binding.homeLoading.visibility = View.GONE
-                        binding.homeErrorContainer.visibility = View.VISIBLE
+                        binding.countryLoading.visibility = View.GONE
+                        binding.countryErrorContainer.visibility = View.VISIBLE
                         Toast.makeText(
                             binding.root.context,
                             getString(R.string.unknown_error),
@@ -115,7 +105,7 @@ class CountryFragment : Fragment() {
             viewModel.countriesDataFlow.collectLatest {
                 //Submit list to adapter
                 countryAdapter.submitList(it) {
-                    binding.homeRecycler.smoothScrollToPosition(0)
+                    binding.countryRecycler.smoothScrollToPosition(0)
                 }
             }
         }
@@ -127,7 +117,7 @@ class CountryFragment : Fragment() {
                 CountryFragmentDirections.actionCountryFragmentToCountryDetailsFragment(it)
             )
         }
-        binding.homeRecycler.apply {
+        binding.countryRecycler.apply {
             layoutManager =
                 LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
             adapter = countryAdapter
@@ -136,13 +126,13 @@ class CountryFragment : Fragment() {
 
     private fun toggleProgressBar(isLoading: Boolean) {
         if (isLoading) {
-            binding.homeLoading.visibility = View.VISIBLE
-            binding.homeRecycler.visibility = View.GONE
-            binding.homeErrorContainer.visibility = View.GONE
+            binding.countryLoading.visibility = View.VISIBLE
+            binding.countryRecycler.visibility = View.GONE
+            binding.countryErrorContainer.visibility = View.GONE
         } else {
-            binding.homeLoading.visibility = View.GONE
-            binding.homeRecycler.visibility = View.VISIBLE
-            binding.homeErrorContainer.visibility = View.GONE
+            binding.countryLoading.visibility = View.GONE
+            binding.countryRecycler.visibility = View.VISIBLE
+            binding.countryErrorContainer.visibility = View.GONE
         }
     }
 
@@ -155,8 +145,10 @@ class CountryFragment : Fragment() {
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                if (menuItem.itemId == R.id.action_search) searchView =
-                    menuItem.actionView as SearchView
+                if (menuItem.itemId == R.id.action_refresh)
+                    showRefreshDialog()
+                if (menuItem.itemId == R.id.action_search)
+                    searchView = menuItem.actionView as SearchView
                 searchView.setQueryHint("Search countries...")
                 searchView.setOnCloseListener {
                     countryAdapter.searchCountries("")
@@ -175,5 +167,19 @@ class CountryFragment : Fragment() {
                 return true
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+
+    private fun showRefreshDialog() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Refresh Countries")
+            .setMessage("Are you sure you want to refresh list of countries?")
+            .setNegativeButton(getString(android.R.string.cancel)) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setPositiveButton(android.R.string.ok) { dialog, _ ->
+                dialog.dismiss()
+                viewModel.refreshCountries()
+            }
+            .show()
     }
 }
