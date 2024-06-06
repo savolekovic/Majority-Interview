@@ -69,13 +69,9 @@ class CountryAdapter : RecyclerView.Adapter<CountryAdapter.CountryViewHolder>() 
         onCountryCLickListener = listener
     }
 
-    fun submitList(countries: List<Country>) {
+    fun submitList(countries: List<Country>, onListSubmitted: () -> Unit) {
         fullCountryList = countries
-        differ.submitList(countries)
-    }
-
-    fun refreshList(){
-        differ.submitList(fullCountryList)
+        differ.submitList(countries, onListSubmitted)
     }
 
     fun searchCountries(query: String) {

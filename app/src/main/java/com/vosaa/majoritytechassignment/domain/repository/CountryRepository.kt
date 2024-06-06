@@ -22,8 +22,8 @@ class CountryRepository @Inject constructor(
     }
 
     fun getAllCountries() = retrieveResourceAsFlow {
-        if (netManager.isConnectedToInternet()) {
-            if (isDataStoreEmpty()) {
+        if (isDataStoreEmpty())
+            if (netManager.isConnectedToInternet()) {
                 val response = remote.getAllCountries()
                 dataStore.updateData {
                     it.copy(
@@ -31,8 +31,19 @@ class CountryRepository @Inject constructor(
                     )
                 }.countries
             } else
-                dataStore.data.first().countries
+                throw NoInternetException()
+        else
+            dataStore.data.first().countries
+    }
 
+    suspend fun refreshCountries() = retrieveResourceAsFlow {
+        if (netManager.isConnectedToInternet()) {
+            val response = remote.getAllCountries()
+            dataStore.updateData {
+                it.copy(
+                    countries = response!!
+                )
+            }.countries
         } else
             throw NoInternetException()
     }

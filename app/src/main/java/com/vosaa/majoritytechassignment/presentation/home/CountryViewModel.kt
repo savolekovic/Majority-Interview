@@ -43,10 +43,18 @@ class CountryViewModel @Inject constructor(
         viewModelScope.launch(handler) {
             _eventFlow.emit(UiStates.LOADING)
             repository.getAllCountries().collect {
-                if (it != null) {
-                    _countriesDataFlow.emit(it)
-                    _eventFlow.emit(UiStates.SUCCESS)
-                }
+                _countriesDataFlow.emit(it)
+                _eventFlow.emit(UiStates.SUCCESS)
+            }
+        }
+    }
+
+    fun refreshCountries() {
+        viewModelScope.launch(handler) {
+            _eventFlow.emit(UiStates.LOADING)
+            repository.refreshCountries().collect {
+                _countriesDataFlow.emit(it)
+                _eventFlow.emit(UiStates.SUCCESS)
             }
         }
     }

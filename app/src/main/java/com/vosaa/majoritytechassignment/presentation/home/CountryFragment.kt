@@ -53,11 +53,18 @@ class CountryFragment : Fragment() {
         val activity = requireActivity() as MainActivity
         activity.setSupportActionBar(binding.homeToolbar)
 
+        setupRefresh()
         setupMenu()
         setupRecycler()
         setupErrorButton()
         observeViewModel()
         viewModel.getAllCountries()
+    }
+
+    private fun setupRefresh() {
+        binding.homeRefresh.setOnRefreshListener {
+            viewModel.refreshCountries()
+        }
     }
 
     private fun setupErrorButton() {
@@ -71,14 +78,17 @@ class CountryFragment : Fragment() {
             viewModel.eventFlow.collectLatest {
                 when (it) {
                     UiStates.LOADING -> {
-                        toggleProgressBar(true)
+                        if (!binding.homeRefresh.isRefreshing)
+                            toggleProgressBar(true)
                     }
 
                     UiStates.SUCCESS -> {
                         toggleProgressBar(false)
+                        binding.homeRefresh.isRefreshing = false
                     }
 
                     UiStates.NO_INTERNET_CONNECTION -> {
+                        binding.homeRefresh.isRefreshing = false
                         binding.homeLoading.visibility = View.GONE
                         binding.homeErrorContainer.visibility = View.VISIBLE
                         Toast.makeText(
@@ -89,6 +99,7 @@ class CountryFragment : Fragment() {
                     }
 
                     else -> {
+                        binding.homeRefresh.isRefreshing = false
                         binding.homeLoading.visibility = View.GONE
                         binding.homeErrorContainer.visibility = View.VISIBLE
                         Toast.makeText(
@@ -103,7 +114,9 @@ class CountryFragment : Fragment() {
         lifecycleScope.launch {
             viewModel.countriesDataFlow.collectLatest {
                 //Submit list to adapter
-                countryAdapter.submitList(it)
+                countryAdapter.submitList(it) {
+                    binding.homeRecycler.smoothScrollToPosition(0)
+                }
             }
         }
     }
@@ -146,16 +159,16 @@ class CountryFragment : Fragment() {
                     menuItem.actionView as SearchView
                 searchView.setQueryHint("Search countries...")
                 searchView.setOnCloseListener {
-                    countryAdapter.refreshList()
+                    countryAdapter.searchCountries("")
                     false
                 }
                 searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                     override fun onQueryTextSubmit(query: String): Boolean {
-                        countryAdapter.searchCountries(query)
                         return false
                     }
 
-                    override fun onQueryTextChange(newText: String): Boolean {
+                    override fun onQueryTextChange(query: String): Boolean {
+                        countryAdapter.searchCountries(query)
                         return false
                     }
                 })
