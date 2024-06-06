@@ -1,4 +1,4 @@
-package com.vosaa.majoritytechassignment.presentation.home
+package com.vosaa.majoritytechassignment.presentation.country_details
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,12 +15,11 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class CountryViewModel @Inject constructor(
+class CountryDetailsViewModel @Inject constructor(
     private val repository: CountryRepository,
 ) : ViewModel() {
-
-    private val _countriesDataFlow = MutableSharedFlow<List<Country>>()
-    val countriesDataFlow = _countriesDataFlow.asSharedFlow()
+    private val _countryDataFlow = MutableSharedFlow<Country>()
+    val countryDataFlow = _countryDataFlow.asSharedFlow()
 
     private val _eventFlow = MutableSharedFlow<UiStates?>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -39,24 +38,15 @@ class CountryViewModel @Inject constructor(
         }
     }
 
-    fun getAllCountries() {
+    fun getCountry(countryName: String) {
         viewModelScope.launch(handler) {
             _eventFlow.emit(UiStates.LOADING)
-            repository.getAllCountries().collect {
-                _countriesDataFlow.emit(it)
-                _eventFlow.emit(UiStates.SUCCESS)
+            repository.getCountry(countryName).collect {
+                if (it != null) {
+                    _countryDataFlow.emit(it)
+                    _eventFlow.emit(UiStates.SUCCESS)
+                }
             }
         }
     }
-
-    fun refreshCountries() {
-        viewModelScope.launch(handler) {
-            _eventFlow.emit(UiStates.LOADING)
-            repository.refreshCountries().collect {
-                _countriesDataFlow.emit(it)
-                _eventFlow.emit(UiStates.SUCCESS)
-            }
-        }
-    }
-
 }

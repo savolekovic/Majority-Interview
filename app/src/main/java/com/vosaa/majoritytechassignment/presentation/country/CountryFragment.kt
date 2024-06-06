@@ -1,4 +1,4 @@
-package com.vosaa.majoritytechassignment.presentation.home
+package com.vosaa.majoritytechassignment.presentation.country
 
 import android.os.Bundle
 import android.view.LayoutInflater

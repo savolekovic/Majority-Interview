@@ -15,11 +15,12 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class CountryDetailsViewModel @Inject constructor(
+class CountryViewModel @Inject constructor(
     private val repository: CountryRepository,
 ) : ViewModel() {
-    private val _countryDataFlow = MutableSharedFlow<Country>()
-    val countryDataFlow = _countryDataFlow.asSharedFlow()
+
+    private val _countriesDataFlow = MutableSharedFlow<List<Country>>()
+    val countriesDataFlow = _countriesDataFlow.asSharedFlow()
 
     private val _eventFlow = MutableSharedFlow<UiStates?>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -38,15 +39,24 @@ class CountryDetailsViewModel @Inject constructor(
         }
     }
 
-    fun getCountry(countryName: String) {
+    fun getAllCountries() {
         viewModelScope.launch(handler) {
             _eventFlow.emit(UiStates.LOADING)
-            repository.getCountry(countryName).collect {
-                if (it != null) {
-                    _countryDataFlow.emit(it)
-                    _eventFlow.emit(UiStates.SUCCESS)
-                }
+            repository.getAllCountries().collect {
+                _countriesDataFlow.emit(it)
+                _eventFlow.emit(UiStates.SUCCESS)
             }
         }
     }
+
+    fun refreshCountries() {
+        viewModelScope.launch(handler) {
+            _eventFlow.emit(UiStates.LOADING)
+            repository.refreshCountries().collect {
+                _countriesDataFlow.emit(it)
+                _eventFlow.emit(UiStates.SUCCESS)
+            }
+        }
+    }
+
 }

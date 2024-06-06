@@ -1,6 +1,6 @@
 package com.vosaa.majoritytechassignment.di
 
-import com.vosaa.majoritytechassignment.presentation.home.CountryAdapter
+import com.vosaa.majoritytechassignment.presentation.country.CountryAdapter
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
